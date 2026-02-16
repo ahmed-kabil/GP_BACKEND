@@ -12,7 +12,7 @@ module.exports = (io) => {
     // Track user online
     socket.on("online", (user_id) => {
       onlineUsers[user_id] = socket.id;
-      console.log("The user " + user_id + " is now online");
+      console.log("The user " + user_id + " is now online .. ");
     });
 
     // Join conversation room
