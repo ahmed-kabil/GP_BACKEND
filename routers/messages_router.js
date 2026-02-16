@@ -8,4 +8,5 @@ router.post("/send", verifyToken,sendMessage);
 router.get("/:conv_id", verifyToken,getMessages);
 router.post("/read", verifyToken,markMessagesAsRead);
 
+
 module.exports = router;

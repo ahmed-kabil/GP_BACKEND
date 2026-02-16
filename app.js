@@ -29,18 +29,18 @@ const staff_Router = require("./routers/staff_router");
 const readings_Router = require("./routers/readings_router");
 const login_Router = require("./routers/Login_router");
 const other_Router = require("./routers/other_router");
-
 const conversations_Routes = require("./routers/conversations_router.js");
 const messages_Routes = require("./routers/messages_router.js");
+const appointments_Routes = require("./routers/appointments_router.js");
 
 app.use("/api/patients/", patients_Router);
 app.use("/api/staff/", staff_Router);
 app.use("/api/readings/", readings_Router);
 app.use("/api/login/", login_Router);
 app.use("/api/other/", other_Router);
-
 app.use("/api/conversations", conversations_Routes);
 app.use("/api/messages", messages_Routes);
+app.use("/api/appointments", appointments_Routes);
 
 // Connect to MongoDB
 mongoose.connect(url)

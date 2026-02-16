@@ -7,5 +7,6 @@ const {verifyToken,  verify_AD, verify_APND} = require("../middleware/verify_tok
 
 router.route("/doc/pats/:id")
      .get(verifyToken,verify_AD,controller.getDocPats)
+    
 
 module.exports = router ; 

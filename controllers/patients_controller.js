@@ -2,7 +2,7 @@ const Readings = require("../models/readings-model");
 const Patients = require("../models/patients-model");
 const Staff = require("../models/staff-model");
 const Login = require("../models/login-model")
-const Conversations = require('../models/conversations-model')
+const {DocPatConversation} = require('../models/conversations-model')
 const Messages = require('../models/messages-model')
 const bcrypt = require("bcryptjs")
 const JWT = require("jsonwebtoken")
@@ -63,7 +63,7 @@ const getAllPatients = async (req,res) => {
           role: "patient"
        })
 
-       let new_convesation =   await new Conversations({
+       let new_convesation =   await new DocPatConversation({
          conversation_id: `conv_${new_patient.patient_id}`,
          doctor_id: new_patient.doctor_id,
          patient_id: new_patient.patient_id,
@@ -95,7 +95,7 @@ const deletePatientById = async (req,res)=>{
        await Patients.deleteOne({ patient_id: req.params.id });
        await Login.deleteOne({ user_id: req.params.id });
        await Readings.deleteMany({device_id: patient.device_id})
-       await Conversations.deleteOne({conversation_id: `conv_${patient.patient_id}`})
+       await DocPatConversation.deleteOne({conversation_id: `conv_${patient.patient_id}`})
        await Messages.deleteMany({conversation_id: `conv_${patient.patient_id}`})
        res.status(200).json({status: "success",data: null})
     }catch(err){
@@ -107,6 +107,7 @@ const deletePatientById = async (req,res)=>{
 const updatePatient = async (req, res) => {
   const id = req.params.id;            // old patient_id
   const newId = req.body.patient_id;   // new patient_id (new user_id)
+
 
   try {
     // 1) Update Patient
@@ -150,7 +151,7 @@ const updatePatient = async (req, res) => {
     if(req.body.name)new_conv_content.patient_name = req.body.name
     if(req.body.patient_id)new_conv_content.conversation_id = new_conv_id
     console.log(new_conv_content)
-    await Conversations.findOneAndUpdate(
+    await DocPatConversation.findOneAndUpdate(
       {conversation_id: `conv_${id}`},
       {$set: new_conv_content},
       {new: true }

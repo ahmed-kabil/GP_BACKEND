@@ -3,6 +3,7 @@ const Staff = require("../models/staff-model");
 const Login = require("../models/login-model")
 const bcrypt = require("bcryptjs")
 const JWT = require("jsonwebtoken")
+const {DocNurConversation} = require("../models/conversations-model")
 
 
 //  here we need to get all readings that have different patient_id
@@ -24,6 +25,46 @@ const getAllStaff = async (req,res) => {
  const addNewStaffMem = async (req, res) => {
     try{
        let new_staff = await new Staff(req.body);
+       if(new_staff.role === "nurse"){
+            const Doctors = await Staff.find({role: "doctor"});
+          for(let i = 0 ; i < Doctors.length ; i++){
+
+            let new_convesation =   await new DocNurConversation({
+               conversation_id: `conv_${Doctors[i].staff_id}_${new_staff.staff_id}`,
+               doctor_id:Doctors[i].staff_id ,
+               nurse_id:new_staff.staff_id ,
+               nurse_name:new_staff.name,
+               doctor_name:Doctors[i].name,
+               last_message: '',
+            })         
+
+            await new_convesation.save()
+
+          }
+
+
+       }else if(new_staff.role === "doctor"){
+
+
+         const Nurses = await Staff.find({role: "nurse"});
+          for(let i = 0 ; i < Nurses.length ; i++){
+
+            let new_convesation =   await new DocNurConversation({
+               conversation_id: `conv_${new_staff.staff_id}_${Nurses[i].staff_id}`,
+               doctor_id: new_staff.staff_id ,
+               nurse_id: Nurses[i].staff_id,
+               nurse_name:Nurses[i].name,
+               doctor_name:new_staff.name,
+               last_message: '',
+            })         
+
+            await new_convesation.save()
+
+          }
+
+       }
+
+
         let  password = new_staff.email.split('@')[0];
  
        let hashed_password =await bcrypt.hash(password , 6);
@@ -108,6 +149,15 @@ const getDoctors = async (req,res) => {
 // future i need to store it for the analysis and delete it from readings db
 const deleteStaffById = async (req,res)=>{
     try{
+       let theStaffMem = await Staff.findOne({staff_id:req.params.id})
+     
+       if(theStaffMem.role == "nurse"){
+        
+          await DocNurConversation.deleteMany({nurse_id:req.params.id})
+         }else if(theStaffMem.role == "doctor"){
+            await DocNurConversation.deleteMany({doctor_id:req.params.id})
+         }
+         
        await Staff.deleteOne({ staff_id: req.params.id });
        await Login.deleteOne({ user_id: req.params.id });
        res.status(200).json({status: "success",data: null})
@@ -116,6 +166,8 @@ const deleteStaffById = async (req,res)=>{
     }
  }
  
+
+
  
  const updateStaffById = async (req,res)=>{
     let id = req.params.id ;
