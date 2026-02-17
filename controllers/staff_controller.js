@@ -24,6 +24,11 @@ const getAllStaff = async (req,res) => {
  
  const addNewStaffMem = async (req, res) => {
     try{
+      let data = await Staff.findOne({staff_id: req.body.staff_id})
+     
+      if(data){
+         return res.status(400).json({status: "failed",data: "the staff_id already exist"});
+      }
        let new_staff = await new Staff(req.body);
        if(new_staff.role === "nurse"){
             const Doctors = await Staff.find({role: "doctor"});
