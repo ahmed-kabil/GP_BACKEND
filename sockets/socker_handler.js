@@ -55,7 +55,14 @@ module.exports = (io) => {
         socket.emit("errorMessage", { error: "Message could not be sent" });
       }
     });
-
+///////////////////////////////////
+socket.on("newAppointment",async (data) => {
+  try{
+    io.to(data.conversation_id).emit("newAppointment",data)
+  }catch{
+    socket.emit("errorMessage", { error: "Message could not be sent" });
+  }
+})
 ////////////////////////////////
 
     socket.on("sendDocNurMessage", async (data) => {
@@ -92,6 +99,8 @@ module.exports = (io) => {
       }
     });
 ///////////////////////////////
+
+
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
 
